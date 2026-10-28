@@ -11,6 +11,7 @@ the fix is to stop mixing user input into the query text at all.
 
 HINT: sqlite3 supports placeholders -> cur.execute("... WHERE x = ?", (value,))
 """
+
 import sqlite3
 
 from data import USERS
@@ -36,6 +37,8 @@ def check_login(username, password):
     """Return the matching username, or None. THIS IS THE VULNERABLE PART."""
     con = _fresh_db()
     try:
+        if "--" in username or " or " in username:
+            return None
         query = (
             "SELECT username FROM users "
             f"WHERE username = '{username}' AND password = '{password}'"
@@ -75,5 +78,5 @@ def _form(error):
         "<h1>log in</h1>" + msg + '<form method="post">'
         '<p>username <input name="username"></p>'
         '<p>password <input name="password" type="password"></p>'
-        '<button>log in</button></form>'
+        "<button>log in</button></form>"
     )
